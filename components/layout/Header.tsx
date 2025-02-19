@@ -1,3 +1,4 @@
+// components/Header.tsx
 import React from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 
@@ -14,11 +15,13 @@ export default function Header({ title, setIsSidebarOpen }: HeaderProps) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-md hover:bg-gray-100 z-50" // Ensure the button is above other elements
             >
               <Menu className="h-6 w-6" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 z-10"> {/* Ensure the title is below the button */}
+              {title}
+            </h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -45,7 +48,7 @@ export default function Header({ title, setIsSidebarOpen }: HeaderProps) {
                 alt="Profile"
                 className="w-8 h-8 rounded-full"
               />
-              <span className="hidden md:inline font-medium">John Doe</span>
+              <span className="hidden md:inline font-medium">Dummy user</span>
             </div>
           </div>
         </div>

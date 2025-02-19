@@ -1,3 +1,4 @@
+// components/Sidebar.tsx
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -97,7 +98,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
               className="w-10 h-10 rounded-full border-2 border-gray-700"
             />
             <div className={`transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 lg:opacity-0 w-0'}`}>
-              <p className="text-sm font-medium text-gray-300">John Doe</p>
+              <p className="text-sm font-medium text-gray-300">Dummy user</p>
               <p className="text-xs text-gray-500">Service Professional</p>
             </div>
           </div>

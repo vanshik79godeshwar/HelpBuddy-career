@@ -35,7 +35,9 @@ export async function POST(request: Request) {
       { expiresIn: '1d' } // Token expires in 1 day
     );
 
-    return NextResponse.json({ token }, { status: 200 });
+    const workerId = worker._id;
+
+    return NextResponse.json({ token, workerId }, { status: 200 });
   } catch (error) {
     console.error('Error during login:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });

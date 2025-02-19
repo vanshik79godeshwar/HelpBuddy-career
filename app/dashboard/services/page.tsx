@@ -1,9 +1,11 @@
+// app/dashboard/service/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Upload, X, Plus, CheckCircle, Clock } from 'lucide-react';
+import AddServiceForm from '@/components/Dashboard/AddServiceForm'; // Import the AddServiceForm component
 import axios from '@/lib/axios';
+import { CheckCircle, Clock, Plus } from 'lucide-react';
 
 interface Service {
   _id: string;
@@ -25,19 +27,6 @@ export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    place: '',
-    description: '',
-    price: 0,
-    duration: '',
-    images: [] as string[],
-  });
-  const [dragActive, setDragActive] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchServices();
@@ -67,93 +56,13 @@ export default function ServicesPage() {
     }
   };
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(e.type === "dragenter" || e.type === "dragover");
+  const handleAddServiceSuccess = () => {
+    fetchServices();
+    setShowAddForm(false);
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    await handleFiles(files);
-  };
-
-  const handleFiles = async (files: File[]) => {
-    for (const file of files) {
-      if (!file.type.startsWith('image/')) {
-        setError('Only image files are allowed');
-        continue;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image size should be less than 5MB');
-        continue;
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-
-      try {
-        const response = await axios.post(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-          formData
-        );
-
-        setFormData(prev => ({
-          ...prev,
-          images: [...prev.images, response.data.secure_url],
-        }));
-      } catch (err: any) {
-        setError('Failed to upload image');
-        console.error('Error uploading to Cloudinary:', err);
-      }
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError('');
-
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('Authentication required');
-
-      await axios.post('/services/add', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      await fetchServices();
-      setShowAddForm(false);
-      setFormData({
-        title: '',
-        category: '',
-        place: '',
-        description: '',
-        price: 0,
-        duration: '',
-        images: [],
-      });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create service');
-      console.error('Error creating service:', err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+  const handleAddServiceCancel = () => {
+    setShowAddForm(false);
   };
 
   if (loading) {
@@ -179,7 +88,7 @@ export default function ServicesPage() {
         {!showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition duration-300 shadow-md hover:shadow-lg"
           >
             <Plus className="w-5 h-5" />
             Add New Service
@@ -188,176 +97,10 @@ export default function ServicesPage() {
 
         {/* Add Service Form */}
         {showAddForm && (
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Add New Service</h2>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Service Title</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="e.g., AC Installation"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    required
-                  >
-                    <option value="">Select category</option>
-                    <option value="AC Installation">AC Installation</option>
-                    <option value="Cleaning">Cleaning</option>
-                    <option value="Plumbing">Plumbing</option>
-                    <option value="Electrical">Electrical</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Place</label>
-                  <select
-                    value={formData.place}
-                    onChange={(e) => setFormData({ ...formData, place: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    required
-                  >
-                    <option value="">Select place</option>
-                    <option value="Home">Home</option>
-                    <option value="Office">Office</option>
-                    <option value="Kitchen">Kitchen</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Price</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                    <input
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                      className="w-full pl-8 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Duration</label>
-                  <input
-                    type="text"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="e.g., 2 hours"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Describe your service..."
-                  required
-                />
-              </div>
-
-              {/* Image Upload */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Service Images</label>
-                <div
-                  className={`border-2 border-dashed rounded-lg p-6 transition-colors
-                    ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
-                    ${formData.images.length === 0 ? 'h-48' : ''}`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  {formData.images.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                      <Upload className="w-12 h-12 mb-4" />
-                      <p className="text-sm text-center">
-                        Drag & drop images here, or{' '}
-                        <label className="text-blue-500 cursor-pointer hover:text-blue-600">
-                          browse
-                          <input
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => handleFiles(Array.from(e.target.files || []))}
-                          />
-                        </label>
-                      </p>
-                      <p className="text-xs mt-2">Maximum 4 images, up to 5MB each</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {formData.images.map((image, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={image}
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-24 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-                >
-                  {submitting ? 'Adding Service...' : 'Add Service'}
-                </button>
-              </div>
-            </form>
-          </div>
+          <AddServiceForm
+            onSuccess={handleAddServiceSuccess}
+            onCancel={handleAddServiceCancel}
+          />
         )}
 
         {/* Services List */}

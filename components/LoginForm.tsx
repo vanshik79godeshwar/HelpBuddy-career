@@ -26,6 +26,8 @@ export default function LoginForm() {
       // Store token in cookies
       Cookies.set('token', data.token, { expires: 1, path: '/' });
       localStorage.setItem('token', data.token);
+      console.log("Data : ", data);
+      localStorage.setItem('WorkerID', data.workerId);
       router.push('/dashboard');
     } catch (err: any) {
       if (err.response) {
