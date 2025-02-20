@@ -2,10 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Globe from '@/components/threeD/Globe';
+// import Globe from '@/components/threeD/Globe';
 import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa';
+import dynamic from 'next/dynamic';
+import SplineViewer from '@/components/splineViewer';
+
+const Globe = dynamic(() => import('../../components/threeD/Globe'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <p className="text-white">Loading 3D Globe...</p>
+    </div>
+  ),
+});
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -61,7 +72,7 @@ export default function SignupPage() {
       <img src="/grid-pattern.svg" alt="Grid Pattern" className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-20 " />
       <div className="w-1/2 h-screen flex flex-col justify-center items-center relative z-10 text-center">
         <div className="absolute inset-0 flex justify-center items-center overflow-hidden">
-          <Globe />
+          <SplineViewer></SplineViewer>
         </div>
         <h1 className="text-4xl font-mono text-gradient z-10 mt-16">{typewriter}</h1>
       </div>

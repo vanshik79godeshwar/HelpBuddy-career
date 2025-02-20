@@ -65,6 +65,7 @@ export default function VerifyOTPForm() {
               id={`otp-${index}`}
               type="text"
               maxLength={1}
+              autofiller="off"
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               className="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 text-lg font-bold"
