@@ -1,14 +1,16 @@
-'use client';  // Make sure this is a Client Component
-import dynamic from 'next/dynamic';
+"use client"; // Ensure it's a client component
 
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,  // Disable server-side rendering
+import dynamic from "next/dynamic";
+
+// Correct way to dynamically import Spline
+const Spline = dynamic(() => import("@splinetool/react-spline").then((mod) => mod.default), {
+  ssr: false, // Disable SSR for client-side rendering
 });
 
 export default function Globe() {
   return (
-    <main className='w-full h-full'>
+    <div className="w-full h-full">
       <Spline scene="https://prod.spline.design/Py9ONWLTKagJdofl/scene.splinecode" />
-    </main>
+    </div>
   );
 }
