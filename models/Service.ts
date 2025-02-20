@@ -18,7 +18,7 @@ export interface IService extends Document {
 const serviceSchema = new Schema<IService>(
   {
     workerId: { type: String, required: true }, // Worker ID from AuthContext or JWT
-    title: { type: String, required: true },
+    title: { type: String, required: true, default: "Service" },
     category: { type: String, required: true },
     place: { type: String, required: true },
     description: { type: String, required: true },

@@ -46,6 +46,7 @@ export default function VerifyOTPForm() {
         setError(data.message || 'Invalid OTP');
       }
     } catch (err) {
+      console.error('Error : ',  err);
       setError('An error occurred. Please try again.');
     }
   };

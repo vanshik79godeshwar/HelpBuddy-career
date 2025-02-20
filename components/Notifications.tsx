@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Bell, Calendar, Clock, CheckCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,25 +14,28 @@ const Notifications = ({ workerId }: NotificationsProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/notifications?workerId=${workerId}`);
       const data = await response.json();
-      // Ensure data is an array
-      setRequests(Array.isArray(data) ? data : []);
+
+      console.log('Fetched data:', data); // Debugging log
+
+      // Ensure _id is treated as a string
+      setRequests(Array.isArray(data) ? data.map(req => ({ ...req, _id: String(req._id) })) : []);
       setError(null);
-    } catch (error) {
+    } catch {
       setError('Failed to load notifications');
-      setRequests([]); // Reset to empty array on error
+      setRequests([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [workerId]);
 
   useEffect(() => {
     fetchRequests();
-  }, [workerId]);
+  }, [fetchRequests]);
 
   const handleAcceptRequest = async (requestId: string) => {
     try {
@@ -47,11 +50,11 @@ const Notifications = ({ workerId }: NotificationsProps) => {
       } else {
         setError('Failed to accept request');
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred while accepting the request');
     }
   };
-  const safeRequests = Array.isArray(requests) ? requests : [];
+
   return (
     <div className="h-full flex flex-col gap-6">
       {/* Header Stats */}
@@ -64,7 +67,8 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">New Requests</p>
-                <p className="text-2xl font-semibold">{safeRequests.length}</p>              </div>
+                <p className="text-2xl font-semibold">{requests.length}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -78,7 +82,8 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               <div>
                 <p className="text-sm text-gray-500">Accepted</p>
                 <p className="text-2xl font-semibold">
-                {safeRequests.filter(r => r.status === 'accepted').length}                </p>
+                  {requests.filter(r => r.status === 'accepted').length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -93,7 +98,8 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               <div>
                 <p className="text-sm text-gray-500">Pending</p>
                 <p className="text-2xl font-semibold">
-                {safeRequests.filter(r => r.status === 'pending').length}                </p>
+                  {requests.filter(r => r.status === 'pending').length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -129,13 +135,13 @@ const Notifications = ({ workerId }: NotificationsProps) => {
                 </div>
               ) : (
                 requests.map((request) => (
-                  <Card key={request._id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <Card key={String(request._id)} className="overflow-hidden hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex flex-col space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium text-lg">{request.category}</h3>
-                            <p className="text-sm text-gray-500">Request ID: {request._id.toString().slice(-8)}</p>
+                            <p className="text-sm text-gray-500">Request ID: {request._id.slice(-8)}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-sm ${
                             request.status === 'pending' 
@@ -168,7 +174,7 @@ const Notifications = ({ workerId }: NotificationsProps) => {
 
                         {request.status === 'pending' && (
                           <Button 
-                            onClick={() => handleAcceptRequest(request._id.toString())}
+                            onClick={() => handleAcceptRequest(request._id)}
                             className="w-full bg-blue-500 hover:bg-blue-600"
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />

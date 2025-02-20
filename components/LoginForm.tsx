@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import { motion } from 'framer-motion';
 import { User, Lock, Loader2 } from 'lucide-react';
 import apiClient from '@/lib/axios';  // Importing your configured axios instance
+import axios from 'axios';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -29,15 +30,14 @@ export default function LoginForm() {
       console.log("Data : ", data);
       localStorage.setItem('WorkerID', data.workerId);
       router.push('/dashboard');
-    } catch (err: any) {
-      if (err.response) {
-        // Error from server response
-        setError(err.response.data.message || 'Invalid credentials');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Invalid credentials');
       } else {
-        // Network error or other issue
         setError('An error occurred. Please try again.');
       }
-    } finally {
+    } 
+      finally {
       setIsLoading(false);
     }
   };

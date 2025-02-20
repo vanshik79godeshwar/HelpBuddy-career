@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Camera, CheckCircle, Loader2, Upload, X, Check } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, Loader2, Upload, X, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,21 +21,23 @@ const Schedule = ({ workerId }: ScheduleProps) => {
   } }>({});
   const [processingIds, setProcessingIds] = useState<string[]>([]);
 
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/schedule?workerId=${workerId}`);
-      const data = await response.json();
-      setRequests(data);
-      setError(null);
-    } catch (error) {
-      setError('Failed to load schedule');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/schedule?workerId=${workerId}`);
+        const data = await response.json();
+        setRequests(data);
+        setError(null);
+      } catch (error) {
+        console.log("error : ", error);
+        setError('Failed to load schedule');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchRequests();
   }, [workerId]);
 
@@ -77,6 +79,7 @@ const Schedule = ({ workerId }: ScheduleProps) => {
 
       return data.secure_url;
     } catch (error) {
+      console.log("error : ", error);
       setError('Failed to upload image');
       setUploadStates(prev => ({
         ...prev,
@@ -113,6 +116,7 @@ const Schedule = ({ workerId }: ScheduleProps) => {
         setError('Failed to mark service as completed');
       }
     } catch (error) {
+      console.log("error : ", error);
       setError('An error occurred while completing the service');
     } finally {
       setProcessingIds(prev => prev.filter(id => id !== serviceRequestId));
@@ -268,7 +272,7 @@ const Schedule = ({ workerId }: ScheduleProps) => {
                 <Calendar className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-medium">Today's Services</p>
+                <p className="text-sm text-gray-500 font-medium">Todays Services</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {loading ? '...' : requests.filter(r => 
                     format(new Date(r.dateTime), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
@@ -339,7 +343,7 @@ const Schedule = ({ workerId }: ScheduleProps) => {
                   <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900">No scheduled services</h3>
                   <p className="text-sm text-gray-500 mt-2 max-w-md mx-auto">
-                    You don't have any services scheduled. New assignments will appear here when you accept them.
+                    You dont have any services scheduled. New assignments will appear here when you accept them.
                   </p>
                 </div>
               ) : (

@@ -1,9 +1,14 @@
 // components/Dashboard/DashboardHeader.tsx
-import { WorkerInfo } from '@/context/AuthContext';
+
+interface worker {
+  fullName: string;
+  isApproved: boolean;
+}
 
 interface DashboardHeaderProps {
-  worker: WorkerInfo | null;
+  worker: worker | null;
 }
+
 
 export default function DashboardHeader({ worker }: DashboardHeaderProps) {
   return (

@@ -4,10 +4,21 @@ import connectDB from '../../../../lib/dbConnect';
 import Service from '../../../../models/Service';
 import { getWorkerIdFromToken } from '../../../../lib/authUtils';
 
+interface serv {
+  title: string;
+  category: string;
+  place: string;
+  description: string;
+  price: number;
+  duration: string;
+  images: string[];
+}
+
 export async function POST(request: Request) {
-  const { title, category, place, description, price, duration, images }: any = await request.json();
+  const body: serv = await request.json();
 
   try {
+    
     await connectDB();
 
     // Extract worker ID from token
@@ -17,13 +28,13 @@ export async function POST(request: Request) {
     // Create new service
     const service = new Service({
       workerId,
-      title : "Service Title",
-      category,
-      place,
-      description,
-      price,
-      duration,
-      images,
+      title: body.title,
+      category: body.category,
+      place: body.place,
+      description: body.description,
+      images: body.images,
+      price: body.price,
+      duration: body.duration,
 
       isApproved: false, // Default to false (admin approval required)
     });

@@ -1,9 +1,9 @@
 // app/api/services/subservices/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import subService from '@/models/subservices'; // Adjust the path as needed
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Connect to the database
     await mongoose.connect(process.env.MONGODB_URI!);
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     // Return the subservices as JSON
     return NextResponse.json(subservices);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching subservices:', error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }

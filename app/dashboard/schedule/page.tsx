@@ -9,7 +9,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const wid = localStorage.getItem('WorkerID');
+      const wid: string = localStorage.getItem('WorkerID') || '';
       setWorkerId(wid);
     }
   }, []);

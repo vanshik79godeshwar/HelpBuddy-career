@@ -6,17 +6,17 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa';
-import dynamic from 'next/dynamic';
+// import dynamic from 'next/dynamic';
 import SplineViewer from '@/components/splineViewer';
 
-const Globe = dynamic(() => import('../../components/threeD/Globe'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <p className="text-white">Loading 3D Globe...</p>
-    </div>
-  ),
-});
+// const Globe = dynamic(() => import('../../components/threeD/Globe'), {
+//   ssr: false,
+//   loading: () => (
+//     <div className="w-full h-full flex items-center justify-center">
+//       <p className="text-white">Loading 3D Globe...</p>
+//     </div>
+//   ),
+// });
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -42,18 +42,26 @@ export default function SignupPage() {
     return () => clearInterval(typeWriterEffect);
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     const fullName = formData.firstName + ' ' + formData.lastName;
+  
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, fullName }),
       });
-      const data = await response.json();
+  
+      interface ApiResponse {
+        message?: string;
+        success?: boolean;
+      }
+  
+      const data: ApiResponse = await response.json(); // Explicitly type the response
+  
       if (response.ok) {
         localStorage.setItem('email', formData.email);
         router.push('/verify-otp');
@@ -61,11 +69,13 @@ export default function SignupPage() {
         setError(data.message || 'Something went wrong');
       }
     } catch (err) {
+      console.error("Error:", err);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex bg-black text-white relative">

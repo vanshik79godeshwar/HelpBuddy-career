@@ -1,11 +1,9 @@
-// lib/authUtils.ts
 import jwt from 'jsonwebtoken';
 
-/**
- * Extracts the worker ID from the JWT token in the request headers.
- * @param request - The incoming request object.
- * @returns The worker ID if the token is valid, otherwise null.
- */
+interface DecodedToken {
+  workerId: string;
+}
+
 export const getWorkerIdFromToken = (request: Request): string | null => {
   const authHeader = request.headers.get('authorization');
   console.log('Authorization Header:', authHeader); // Debugging log
@@ -22,9 +20,9 @@ export const getWorkerIdFromToken = (request: Request): string | null => {
   }
 
   try {
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET!);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
     console.log('Decoded Token:', decodedToken); // Debugging log
-    return decodedToken.workerId; // Assuming the token includes a `workerId` field
+    return decodedToken.workerId;
   } catch (error) {
     console.error('Error decoding token:', error);
     return null;

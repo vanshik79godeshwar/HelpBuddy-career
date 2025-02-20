@@ -4,8 +4,9 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import AddServiceForm from '@/components/Dashboard/AddServiceForm'; // Import the AddServiceForm component
-import axios from '@/lib/axios';
+// import axios from '@/lib/axios';
 import { CheckCircle, Clock, Plus } from 'lucide-react';
+import axios from 'axios';
 
 interface Service {
   _id: string;
@@ -40,21 +41,30 @@ export default function ServicesPage() {
         setLoading(false);
         return;
       }
-
+  
       const response = await axios.get('/services', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       setServices(response.data.services);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load services');
-      console.error('Error fetching services:', err);
+    } catch (err: unknown) { 
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Failed to load services');
+        console.error('Error fetching services:', err.message);
+      } else if (err instanceof Error) {
+        setError(err.message);
+        console.error('General error:', err.message);
+      } else {
+        setError('An unexpected error occurred');
+        console.error('Unknown error:', err);
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleAddServiceSuccess = () => {
     fetchServices();

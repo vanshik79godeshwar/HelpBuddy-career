@@ -1,7 +1,7 @@
 'use client';
 
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { LineChart, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, Bar, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
 const data = {
   monthly: [

@@ -15,8 +15,8 @@ function generateRandomColor() {
   return "#" + randomColor.padStart(6, '0');
 }
 
-export function ParticleField(props: any) {
-  const points = useRef<any>();
+export function ParticleField(props: React.ComponentProps<'points'>) {
+  const points = useRef<THREE.Points>(null);
   const { viewport } = useThree();
   const count = 500;
 
