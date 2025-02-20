@@ -17,13 +17,14 @@ export async function POST(request: Request) {
     // Create new service
     const service = new Service({
       workerId,
-      title,
+      title : "Service Title",
       category,
       place,
       description,
       price,
       duration,
       images,
+
       isApproved: false, // Default to false (admin approval required)
     });
     await service.save();

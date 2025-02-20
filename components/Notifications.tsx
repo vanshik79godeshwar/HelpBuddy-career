@@ -19,10 +19,12 @@ const Notifications = ({ workerId }: NotificationsProps) => {
       setLoading(true);
       const response = await fetch(`/api/notifications?workerId=${workerId}`);
       const data = await response.json();
-      setRequests(data);
+      // Ensure data is an array
+      setRequests(Array.isArray(data) ? data : []);
       setError(null);
     } catch (error) {
       setError('Failed to load notifications');
+      setRequests([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
@@ -49,7 +51,7 @@ const Notifications = ({ workerId }: NotificationsProps) => {
       setError('An error occurred while accepting the request');
     }
   };
-
+  const safeRequests = Array.isArray(requests) ? requests : [];
   return (
     <div className="h-full flex flex-col gap-6">
       {/* Header Stats */}
@@ -62,8 +64,7 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">New Requests</p>
-                <p className="text-2xl font-semibold">{requests.length}</p>
-              </div>
+                <p className="text-2xl font-semibold">{safeRequests.length}</p>              </div>
             </div>
           </CardContent>
         </Card>
@@ -77,8 +78,7 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               <div>
                 <p className="text-sm text-gray-500">Accepted</p>
                 <p className="text-2xl font-semibold">
-                  {requests.filter(r => r.status === 'accepted').length}
-                </p>
+                {safeRequests.filter(r => r.status === 'accepted').length}                </p>
               </div>
             </div>
           </CardContent>
@@ -93,8 +93,7 @@ const Notifications = ({ workerId }: NotificationsProps) => {
               <div>
                 <p className="text-sm text-gray-500">Pending</p>
                 <p className="text-2xl font-semibold">
-                  {requests.filter(r => r.status === 'pending').length}
-                </p>
+                {safeRequests.filter(r => r.status === 'pending').length}                </p>
               </div>
             </div>
           </CardContent>

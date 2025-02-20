@@ -1,16 +1,11 @@
-"use client"; // Ensure it's a client component
+import Spline from '@splinetool/react-spline/next';
 
-import dynamic from "next/dynamic";
-
-// Correct way to dynamically import Spline
-const Spline = dynamic(() => import("@splinetool/react-spline").then((mod) => mod.default), {
-  ssr: false, // Disable SSR for client-side rendering
-});
-
-export default function Globe() {
+export default function Home() {
   return (
-    <div className="w-full h-full">
-      <Spline scene="https://prod.spline.design/Py9ONWLTKagJdofl/scene.splinecode" />
-    </div>
+    <main>
+      <Spline
+        scene="https://prod.spline.design/sPgCYfV9eYM551WD/scene.splinecode" 
+      />
+    </main>
   );
 }
